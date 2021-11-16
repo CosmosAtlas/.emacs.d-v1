@@ -11,7 +11,7 @@
 
 (setq visible-bell nil) ; Disable visual bell
 
-(set-face-attribute 'default nil :font "PragmataPro Liga" :height 130)
+(set-face-attribute 'default nil :font "PragmataPro Liga" :height 140)
 
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -36,7 +36,7 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-;; Disable line numbers for same modes
+;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		eshell-mode-hook))
@@ -170,6 +170,7 @@
 (use-package evil-magit
   :after magit)
 
+(use-package all-the-icons)
 
 ;; Enable PragmataPro Ligatures
 (add-to-list 'load-path "~/.emacs.d/addons/emacs-pragmatapro-ligatures")
@@ -180,16 +181,6 @@
 ;; (add-hook 'prog-mode-hook 'pragmatapro-lig-mode)
 ;; or globally
 (pragmatapro-lig-global-mode)
-
-
-;; Legacy config
-(require 'mu4e)
-
-(setq mail-user-agent 'mu4e-user-agent)
-
-(setq mu4e-sent-folder "/Sent Items")
-(setq mu4e-drafts-folder "/Drafts")
-(setq mu4e-trash-folder "/Trash")
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
