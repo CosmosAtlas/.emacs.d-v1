@@ -2,25 +2,26 @@
 
 (setq inhibit-startup-message t) ; Start with a blank screen
 
+;; Tweaks UI to be ultra clean
 (scroll-bar-mode -1) ; Disable visible scrollbar
 (tool-bar-mode -1)   ; Disable the toolbar
 (tooltip-mode -1)    ; Disable tooltips
 (set-fringe-mode 10) ; Give some breathing room
-
 (menu-bar-mode -1)   ; Disable the menu bar
 
-(setq visible-bell nil) ; Disable visual bell
+;; Completely turn off bells
+(setq visible-bell nil)   ; Visual bell
+(setq ring-bell-function 'ignore) ; Annoying sound bell
 
-(set-face-attribute 'default nil :font "PragmataPro Liga" :height 140)
+(set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
 
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; Package management setup
 (require 'package)
-
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -62,6 +63,9 @@
   :config
   (ivy-mode 1))
 
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
 
 (use-package doom-modeline
   :ensure t
@@ -106,14 +110,8 @@
   (general-create-definer cosmos/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
-    :global-prefix "C-SPC")
+    :global-prefix "C-SPC"))
 
-  (cosmos/leader-keys
-   "t" '(:ignore t :which-key "toggles")
-   "tt" '(counsel-load-theme :which-key "choose theme")))
-
-(general-define-key
- "C-M-j" 'counsel-switch-buffer)
 
 (use-package evil
   :init
@@ -139,7 +137,13 @@
   :config
   (evil-collection-init))
 
+(use-package evil-commentary
+  :after evil
+  :config
+  (evil-commentary-mode))
 
+
+;; Dynamically change font size via hydra
 (use-package hydra)
 
 (defhydra hydra-text-scale (:timeout 4)
@@ -151,40 +155,30 @@
 (cosmos/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
-(use-package projectile
-  :diminish projectile-mode
-  :config (projectile-mode)
-  :custom ((projectile-completion-system 'ivy))
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :init
-  (when (file-directory-p "~/Projects")
-    (setq projectile-project-search-path '("~/Projects")))
-  (setq projectile-switch-project-action #'projectile-dired))
+(defun edit-user-init-file ()
+  "Edit the `user-init-file'"
+  (interactive)
+  (find-file user-init-file))
+
 
 (use-package magit
   :commands (magit-status magit-get-current-branch)
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-(use-package evil-magit
-  :after magit)
-
-(use-package all-the-icons)
-
-;; Enable PragmataPro Ligatures
-(add-to-list 'load-path "~/.emacs.d/addons/emacs-pragmatapro-ligatures")
-(require 'pragmatapro-lig)
-
-;; Enable pragmatapro-lig-mode for specific modes
-;; (add-hook 'text-mode-hook 'pragmatapro-lig-mode)
-;; (add-hook 'prog-mode-hook 'pragmatapro-lig-mode)
-;; or globally
-(pragmatapro-lig-global-mode)
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
-(require 'evil-magit)
+
+
+;; Custom keymappings
+(cosmos/leader-keys
+  "ed" (lambda() (interactive) (find-file user-init-file))
+  "t" '(:ignore t :which-key "toggles")
+  "tt" '(counsel-load-theme :which-key "choose theme")
+  "bb" 'counsel-switch-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
