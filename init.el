@@ -18,6 +18,9 @@
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; Always UTF-8
+(set-language-environment "UTF-8")
+
 ;; Package management setup
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -37,13 +40,71 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
+;; [fixme] don't highlight lines over X chars
+;; [fixme] highlight the textwidth column
+
+;; Always enable visual line (i.e., line wrap)
+(global-visual-line-mode 1)
+
+(global-whitespace-mode 1)
+;; newline char as ¬
+(setq whitespace-display-mappings
+      '((newline-mark 10 [172 10])))
+
 ;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-		term-mode-hook
+(dolist (mode '(term-mode-hook
 		eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 (use-package command-log-mode)
+
+;; restart-emacs
+(use-package restart-emacs)
+
+;; Org Mode Configuration ------------------------------------------------------
+;; Configure org-mode
+(defun cz/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
+
+(defun cz/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;; Set faces for heading levels
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.1)
+                  (org-level-3 . 1.05)
+                  (org-level-4 . 1.0)
+                  (org-level-5 . 1.1)
+                  (org-level-6 . 1.1)
+                  (org-level-7 . 1.1)
+                  (org-level-8 . 1.1)))))
+
+(use-package org
+  :hook (org-mode . cz/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾")
+  (cz/org-font-setup))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+(defun cz/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . cz/org-mode-visual-fill))
+
+;; == End of Org-mode setup
 
 ;; [fixme] automated popups
 (use-package ivy
@@ -72,8 +133,15 @@
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
-(use-package gruvbox-theme
-  :init (load-theme 'gruvbox t))
+(use-package doom-themes
+  :ensure t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t
+	doom-themes-enable-italic t)
+  (load-theme 'doom-ayu-mirage t)
+
+  (doom-themes-org-config))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -172,13 +240,37 @@
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
 
-
 ;; Custom keymappings
 (cosmos/leader-keys
   "ed" (lambda() (interactive) (find-file user-init-file))
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
   "bb" 'counsel-switch-buffer)
+
+
+;; setting up org-mode faces
+;; src: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
+(custom-theme-set-faces
+ 'user
+ '(variable-pitch ((t (:family "ETBembo" :height 130))))
+ '(fixed-pitch ((t (:family "Sarasa Term SC" :height 130)))))
+
+(add-hook 'org-mode-hook 'variable-pitch-mode)
+  (custom-theme-set-faces
+   'user
+   '(org-block ((t (:inherit fixed-pitch))))
+   '(org-code ((t (:inherit (shadow fixed-pitch)))))
+   '(org-document-info ((t (:foreground "dark orange"))))
+   '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+   '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+   '(org-link ((t (:foreground "royal blue" :underline t))))
+   '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-property-value ((t (:inherit fixed-pitch))) t)
+   '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+   '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+   '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+   '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -187,9 +279,12 @@
  ;; If there is more than one, they won't work right.
  '(counsel-describe-function-function 'helpful-callable)
  '(counsel-describe-variable-function 'helpful-variable)
+ '(custom-safe-themes
+   '("6bdcff29f32f85a2d99f48377d6bfa362768e86189656f63adbf715ac5c1340b" default))
  '(doom-modeline-height 15)
+ '(org-hide-emphasis-markers t)
  '(package-selected-packages
-   '(org-plus-contrib projectile hydra general which-key use-package rainbow-delimiters ivy-rich helpful gruvbox-theme evil-surround evil-org evil-nerd-commenter evil-mu4e evil-magit evil-collection elfeed-org doom-modeline counsel command-log-mode)))
+   '(doom-themes restart-emacs elfeed elfeed-protocol org-plus-contrib projectile hydra general which-key use-package rainbow-delimiters ivy-rich helpful gruvbox-theme evil-surround evil-org evil-nerd-commenter evil-mu4e evil-magit evil-collection elfeed-org doom-modeline counsel command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
