@@ -15,17 +15,41 @@
 (setq visible-bell nil)   ; Visual bell
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
-;; 中文简单测试
 ;; Font settings generic
-(set-face-attribute 'default nil :font "Iosevka" :height 130)
+;; (set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
+;; 中文测试
 
+(set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
+
+;; [fixme] work around for mixed-pitch-mode
 (dolist (charset '(kana han symbol cjk-misc bopomofo))
 (set-fontset-font (frame-parameter nil 'font)
 		    charset
-		    (font-spec :family "FZPingXianYaSongS-R-GB" :height 130)))
+		    (font-spec :family "Sarasa Term SC" :height 130)))
 
-(set-face-attribute 'variable-pitch nil :font "ETBembo" :height 130)
-(set-face-attribute 'fixed-pitch nil :font "Iosevka" :height 130)
+(create-fontset-from-fontset-spec
+ (font-xlfd-name
+  (font-spec :family "ETBembo"
+	     :height 130
+	     :registry "fontset-myvariable")))
+
+(set-fontset-font
+ "fontset-myvariable"
+ 'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
+
+(create-fontset-from-fontset-spec
+ (font-xlfd-name
+  (font-spec :family "Iosevka"
+	     :height 130
+	     :registry "fontset-mypitch")))
+
+(set-fontset-font
+ "fontset-mypitch"
+ 'han (font-spec :family "Sarasa Term SC" :height 130))
+
+(set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
+
+(set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130)
 
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -125,7 +149,7 @@
 ;; Configure org-mode
 (defun cz/org-mode-setup ()
   (org-indent-mode)
-  ;; (variable-pitch-mode 1)
+  (variable-pitch-mode 1)
   (visual-line-mode 1))
 
 (defun cz/org-font-setup ()
@@ -142,7 +166,17 @@
 		  (org-level-5 . 1.1)
 		  (org-level-6 . 1.1)
 		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))))
+		  (org-level-8 . 1.1))))
+
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  ;; (set-face-attribute 'org-table nil   :inherit 'fixed-pitch)
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
 
 (use-package org
   :hook (org-mode . cz/org-mode-setup)
@@ -162,6 +196,8 @@
 	visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
+
+;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family and ignores :fontset. Leading to some undesirable results : (
 (use-package mixed-pitch
   :hook
   (text-mode . mixed-pitch-mode))
