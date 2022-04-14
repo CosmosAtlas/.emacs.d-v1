@@ -24,6 +24,8 @@
 		    charset
 		    (font-spec :family "FZPingXianYaSongS-R-GB" :height 130)))
 
+(set-face-attribute 'variable-pitch nil :font "ETBembo" :height 130)
+(set-face-attribute 'fixed-pitch nil :font "Iosevka" :height 130)
 
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -56,13 +58,15 @@
 ;; Always enable visual line (i.e., line wrap)
 (global-visual-line-mode 1)
 
-(global-whitespace-mode 1)
-(setq whitespace-global-modes '(not org-mode))
-;; newline char as ¬
-(setq whitespace-display-mappings
-      '((newline-mark 10 [172 10])))
-
 (setq-default show-trailing-whitespace t)
+(dolist (hook '(special-mode-hook
+		term-mode-hook
+		comint-mode-hook
+		compilation-mode-hook
+		minibuffer-setup-hook))
+	(add-hook hook
+	    (lambda () (setq show-trailing-whitespace nil))))
+
 
 (use-package highlight-indent-guides)
 (setq highlight-indent-guides-method 'column)
@@ -121,7 +125,7 @@
 ;; Configure org-mode
 (defun cz/org-mode-setup ()
   (org-indent-mode)
-  (variable-pitch-mode 1)
+  ;; (variable-pitch-mode 1)
   (visual-line-mode 1))
 
 (defun cz/org-font-setup ()
@@ -144,6 +148,7 @@
   :hook (org-mode . cz/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
+  (setq org-hide-emphasis-markers t)
   (cz/org-font-setup))
 
 (use-package org-bullets
@@ -157,10 +162,18 @@
 	visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
+(use-package mixed-pitch
+  :hook
+  (text-mode . mixed-pitch-mode))
+
 (use-package visual-fill-column
   :hook (org-mode . cz/org-mode-visual-fill))
 
 ;; == End of Org-mode setup
+
+(use-package markdown-mode
+  :ensure t
+  :commands (markdown-mode gfm-mode))
 
 ;; [fixme] automated popups
 (use-package ivy
@@ -236,8 +249,6 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-
-
 ;; Dynamically change font size via hydra
 (use-package hydra)
 
@@ -284,63 +295,6 @@
 
 (use-package projectile-ripgrep)
 
-;; 中文简单测试
-;; setting up org-mode faces
-;; src: https://zzamboni.org/post/beautifying-org-mode-in-emacs/
-(custom-theme-set-faces
- 'user
- '(variable-pitch ((t (:family "ETBembo" :height 130))))
- '(fixed-pitch ((t (:family "Iosevka" :height 130 :style "regular")))))
-
-(add-hook 'org-mode-hook 'variable-pitch-mode)
-(custom-theme-set-faces
- 'user
- ;; Also override white space, otherwise unable to achieve alignment as spaces are a different face
- '(whitespace-space ((t (:inherit fixed-pitch))))
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-link ((t (:foreground "royal blue" :underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(counsel-describe-function-function 'helpful-callable)
- '(counsel-describe-variable-function 'helpful-variable)
- '(custom-safe-themes
-   '("6bdcff29f32f85a2d99f48377d6bfa362768e86189656f63adbf715ac5c1340b" default))
- '(doom-modeline-height 15)
- '(org-hide-emphasis-markers t)
- '(package-selected-packages
-   '(undo-tree valign highlight-indent-guides cnfonts cnfont doom-themes restart-emacs elfeed elfeed-protocol org-plus-contrib projectile hydra general which-key use-package rainbow-delimiters ivy-rich helpful gruvbox-theme evil-surround evil-org evil-nerd-commenter evil-mu4e evil-magit evil-collection elfeed-org doom-modeline counsel command-log-mode)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(fixed-pitch ((t (:family "Iosevka" :height 130 :style "regular"))))
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-link ((t (:foreground "royal blue" :underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch)))))
- '(variable-pitch ((t (:family "ETBembo" :height 130))))
- '(whitespace-space ((t (:inherit fixed-pitch)))))
+;; use seprate custom file
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
