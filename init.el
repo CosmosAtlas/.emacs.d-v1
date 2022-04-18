@@ -15,47 +15,20 @@
 (setq visible-bell nil)   ; Visual bell
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
-;; Font settings generic
-;; (set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
-;; 中文测试
-
-(set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
-
-;; [fixme] work around for mixed-pitch-mode
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-(set-fontset-font (frame-parameter nil 'font)
-		    charset
-		    (font-spec :family "Sarasa Term SC" :height 130)))
-
-(create-fontset-from-fontset-spec
- (font-xlfd-name
-  (font-spec :family "ETBembo"
-	     :height 130
-	     :registry "fontset-myvariable")))
-
-(set-fontset-font
- "fontset-myvariable"
- 'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
-
-(create-fontset-from-fontset-spec
- (font-xlfd-name
-  (font-spec :family "Iosevka"
-	     :height 130
-	     :registry "fontset-mypitch")))
-
-(set-fontset-font
- "fontset-mypitch"
- 'han (font-spec :family "Sarasa Term SC" :height 130))
-
-(set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
-
-(set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130)
-
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; Always UTF-8
 (set-language-environment "UTF-8")
+
+(setq
+ backup-by-copying t
+ backup-directory-alist
+ '(("." . "~/.saves/"))
+ delete-old-versions t
+ kept-new-versions 6
+ kept-old-versions 2
+ version-control t)
 
 ;; Package management setup
 (require 'package)
@@ -110,6 +83,7 @@
   (setq evil-want-C-i-jump nil)
   :config
   (evil-mode 1)
+  (evil-set-undo-system 'undo-redo)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
@@ -130,13 +104,7 @@
   :config
   (evil-commentary-mode))
 
-(use-package undo-tree
-  :ensure t
-  :after evil
-  :diminish
-  :config
-  (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1))
+
 
 (use-package command-log-mode)
 
@@ -145,7 +113,61 @@
   :init
   (setq restart-emacs-restore-frames t))
 
+(use-package minimap
+  :init
+  (setq minimap-minimum-width 15)
+  (setq minimap-window-location 'right))
+
+(use-package git-gutter-fringe
+  :config
+  (global-git-gutter-mode +1))
+
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
+
+;;
+;; Font settings generic
+;;
+
+(set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
+
+;; [fixme] work around for mixed-pitch-mode
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+(set-fontset-font (frame-parameter nil 'font)
+		    charset
+		    (font-spec :family "Sarasa Term SC" :height 130)))
+
+(create-fontset-from-fontset-spec
+ (font-xlfd-name
+  (font-spec :family "ETBembo"
+	     :height 130
+	     :registry "fontset-myvariable")))
+
+(set-fontset-font
+ "fontset-myvariable"
+ 'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
+
+(create-fontset-from-fontset-spec
+ (font-xlfd-name
+  (font-spec :family "Iosevka"
+	     :height 130
+	     :registry "fontset-mypitch")))
+
+(set-fontset-font
+ "fontset-mypitch"
+ 'han (font-spec :family "Sarasa Term SC" :height 130))
+
+(set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
+
+(set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130)
+
+;;
 ;; Org Mode Configuration ------------------------------------------------------
+;;
+
 ;; Configure org-mode
 (defun cz/org-mode-setup ()
   (org-indent-mode)
@@ -191,13 +213,17 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
+(use-package org-autolist
+  :after org
+  :hook (org-mode . org-autolist-mode))
+
 (defun cz/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
 	visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
-
-;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family and ignores :fontset. Leading to some undesirable results : (
+;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family
+;; and ignores :fontset. Leading to some undesirable results : (
 (use-package mixed-pitch
   :hook
   (text-mode . mixed-pitch-mode))
@@ -205,7 +231,9 @@
 (use-package visual-fill-column
   :hook (org-mode . cz/org-mode-visual-fill))
 
+;;
 ;; == End of Org-mode setup
+;;
 
 (use-package markdown-mode
   :ensure t
