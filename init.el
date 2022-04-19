@@ -59,6 +59,8 @@
 (dolist (hook '(special-mode-hook
 		term-mode-hook
 		comint-mode-hook
+		elfeed-search-update-hook
+		elfeed-show-mode-hook
 		compilation-mode-hook
 		minibuffer-setup-hook))
 	(add-hook hook
@@ -366,7 +368,6 @@
   :bind
   ("C-x w" . elfeed))
 
-;; [fixme] investigate why long names render error
 ;; [fixme] try to load read items
 (use-package elfeed-protocol
   :ensure t
@@ -381,7 +382,7 @@
   (elfeed-feeds (list
 		 (list "ttrss+http://admin@192.168.2.130:181"
 		       :api-url "http://admin@192.168.2.130:181"
-		       :password (shell-command-to-string "echo -n `pass freshrss | head -n1`")))))
+		       :password (shell-command-to-string "echo -n `gopass freshrss | head -n1`")))))
 
 (defun elfeed-mark-all-as-read ()
   (interactive)
