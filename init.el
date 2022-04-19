@@ -1,7 +1,6 @@
 ;; Inspired by Emacs from Scratch
 ;; https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ
 
-;; [fixme] set startup page with recently edited files and bookmarks
 (setq inhibit-startup-message t) ; Start with a blank screen
 
 ;; Tweaks UI to be ultra clean
@@ -33,7 +32,7 @@
 ;; Package management setup
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -49,7 +48,8 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-;; [fixme] don't highlight lines over X chars
+;; [fixme] don't highlight lines over X chars -- caused by whitespace mode, not in effect after deleting it
+;; whitespace mode interferes with org-mode variable font, it'll treat spaces in pitched font as variable font and produce very strange spacing.
 ;; [fixme] highlight the textwidth column
 
 ;; Always enable visual line (i.e., line wrap)
@@ -132,37 +132,40 @@
 ;; Font settings generic
 ;;
 
-(set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
+;; avoid problems with emacs running in terminal
+(when (display-graphic-p)
 
-;; [fixme] work around for mixed-pitch-mode
-(dolist (charset '(kana han symbol cjk-misc bopomofo))
-(set-fontset-font (frame-parameter nil 'font)
-		    charset
-		    (font-spec :family "Sarasa Term SC" :height 130)))
+    (set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
 
-(create-fontset-from-fontset-spec
- (font-xlfd-name
-  (font-spec :family "ETBembo"
-	     :height 130
-	     :registry "fontset-myvariable")))
+    ;; [fixme] work around for mixed-pitch-mode
+    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font)
+			charset
+			(font-spec :family "Sarasa Term SC" :height 130)))
 
-(set-fontset-font
- "fontset-myvariable"
- 'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
+    (create-fontset-from-fontset-spec
+    (font-xlfd-name
+    (font-spec :family "ETBembo"
+		:height 130
+		:registry "fontset-myvariable")))
 
-(create-fontset-from-fontset-spec
- (font-xlfd-name
-  (font-spec :family "Iosevka"
-	     :height 130
-	     :registry "fontset-mypitch")))
+    (set-fontset-font
+    "fontset-myvariable"
+    'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
 
-(set-fontset-font
- "fontset-mypitch"
- 'han (font-spec :family "Sarasa Term SC" :height 130))
+    (create-fontset-from-fontset-spec
+    (font-xlfd-name
+    (font-spec :family "Iosevka"
+		:height 130
+		:registry "fontset-mypitch")))
 
-(set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
+    (set-fontset-font
+    "fontset-mypitch"
+    'han (font-spec :family "Sarasa Term SC" :height 130))
 
-(set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130)
+    (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
+
+    (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130))
 
 ;;
 ;; Org Mode Configuration ------------------------------------------------------
@@ -358,6 +361,38 @@
 	      ("C-c p" . projectile-command-map)))
 
 (use-package projectile-ripgrep)
+
+(use-package elfeed
+  :bind
+  ("C-x w" . elfeed))
+
+;; [fixme] investigate why long names render error
+;; [fixme] try to load read items
+(use-package elfeed-protocol
+  :ensure t
+  :demand t
+  :after elfeed
+  :config
+  (elfeed-protocol-enable)
+  :custom
+  (elfeed-use-curl t)
+  (elfeed-set-timeout 36000)
+  (elfeed-log-level 'debug)
+  (elfeed-feeds (list
+		 (list "ttrss+http://admin@192.168.2.130:181"
+		       :api-url "http://admin@192.168.2.130:181"
+		       :password (shell-command-to-string "echo -n `pass freshrss | head -n1`")))))
+
+(defun elfeed-mark-all-as-read ()
+  (interactive)
+  (mark-whole-buffer)
+  (elfeed-search-untag-all-unread))
+
+(defun cz/elfeed-all-read-refresh()
+  (interactive)
+  (when (y-or-n-p "Really mark all items as read?")
+    (elfeed-mark-all-as-read)
+    (elfeed-serch-fetch nil)))
 
 ;; use seprate custom file
 (setq custom-file "~/.emacs.d/custom.el")
