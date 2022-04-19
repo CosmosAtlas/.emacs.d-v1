@@ -46,3 +46,12 @@ flycheck_*.el
 
 # network security
 /network-security.data
+
+# files created automatically by plugins
+
+custom.el
+recentf
+url/
+projectile-bookmarks.eld
+transient/
+.local/
