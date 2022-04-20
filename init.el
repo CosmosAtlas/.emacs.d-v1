@@ -382,7 +382,7 @@
   (elfeed-feeds (list
 		 (list "ttrss+http://admin@192.168.2.130:181"
 		       :api-url "http://admin@192.168.2.130:181"
-		       :password (shell-command-to-string "echo -n `gopass freshrss | head -n1`")))))
+		       :password (shell-command-to-string "gopass -o freshrss")))))
 
 (defun elfeed-mark-all-as-read ()
   (interactive)
