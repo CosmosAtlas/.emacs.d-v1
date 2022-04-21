@@ -178,7 +178,9 @@
 
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130))
 
-(use-package org-roam)
+(use-package org-roam
+  :custom
+  (org-roam-db-autosync-mode))
 
 ;;
 ;; Org Mode Configuration ------------------------------------------------------
@@ -421,18 +423,10 @@
 ;;
 
 (use-package company
-  :config
+  :init
+  (global-company-mode)
   :hook
   (after-init-hook . global-company-mode))
-
-
-(defun cz/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
-
-(use-package company-jedi
-  :after company
-  :hook
-  (python-mode-hook . cz/python-mode-hook))
 
 ;; use seprate custom file
 (setq custom-file "~/.emacs.d/custom.el")
