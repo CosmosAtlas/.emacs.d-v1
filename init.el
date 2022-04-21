@@ -14,6 +14,16 @@
 (setq visible-bell nil)   ; Visual bell
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
+;;
+;; System specific configurations
+;;
+
+(load-file (expand-file-name
+	    (cond ((eq system-type 'windows-nt) "windows.el")
+		  ((eq system-type 'gnu/linux) "linux.el")
+		  (t "default-system.el"))
+	    user-emacs-directory))
+
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -88,6 +98,7 @@
   (evil-set-undo-system 'undo-redo)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+  (define-key evil-motion-state-map (kbd "RET") nil)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -105,8 +116,6 @@
   :after evil
   :config
   (evil-commentary-mode))
-
-
 
 (use-package command-log-mode)
 
@@ -168,6 +177,8 @@
     (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
 
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130))
+
+(use-package org-roam)
 
 ;;
 ;; Org Mode Configuration ------------------------------------------------------
@@ -352,6 +363,9 @@
   "ed" (lambda() (interactive) (find-file user-init-file))
   "t" '(:ignore t :which-key "toggles")
   "p" 'projectile-command-map
+  "of" 'org-roam-node-find
+  "oc" 'org-roam-capture
+  "oi" 'org-roam-node-insert
   "tt" '(counsel-load-theme :which-key "choose theme")
   "bb" 'counsel-switch-buffer)
 
@@ -394,6 +408,31 @@
   (when (y-or-n-p "Really mark all items as read?")
     (elfeed-mark-all-as-read)
     (elfeed-serch-fetch nil)))
+
+;; auto update packages
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-deleted-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe))
+
+;;
+;; autocompletion setup
+;;
+
+(use-package company
+  :config
+  :hook
+  (after-init-hook . global-company-mode))
+
+
+(defun cz/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(use-package company-jedi
+  :after company
+  :hook
+  (python-mode-hook . cz/python-mode-hook))
 
 ;; use seprate custom file
 (setq custom-file "~/.emacs.d/custom.el")

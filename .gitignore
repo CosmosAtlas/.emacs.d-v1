@@ -57,3 +57,5 @@ transient/
 .local/
 bookmarks
 projectile.cache
+.last-package-update-day
+org-roam.db
