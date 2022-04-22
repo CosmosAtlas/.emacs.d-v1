@@ -422,18 +422,14 @@
   :after elfeed
   :config
   (elfeed-protocol-enable)
-  :bind
-  :map elfeed-search-mode-map
-  ("ga" . cz/elfeed-mark-cursor-read)
-  ("gA" . cz/elfeed-all-read-refresh)
   :custom
   (elfeed-use-curl t)
   (elfeed-set-timeout 36000)
   (elfeed-log-level 'debug)
   (elfeed-feeds (list
-		 (list "ttrss+http://admin@192.168.2.130:181"
-		       :api-url "http://admin@192.168.2.130:181"
-		       :password (shell-command-to-string "gopass -o freshrss")))))
+		 (list "fever+http://cosmos@192.168.2.130:50180"
+		       :api-url "http://cosmos@192.168.2.130:50180/api/fever.php"
+		       :password (shell-command-to-string "gopass -o freshrss"))))
 
 ;;
 ;; autocompletion setup
