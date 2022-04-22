@@ -288,6 +288,12 @@
 (use-package visual-fill-column
   :hook (org-mode . cz/org-mode-visual-fill))
 
+(with-eval-after-load "ispell"
+  (setq ispell-program-name "aspell")
+  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC")))
+
+(add-hook 'org-mode-hook (lambda () (setq flyspell-mode 1)))
+
 ;;
 ;; == End of Org-mode setup
 ;;
