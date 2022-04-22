@@ -440,6 +440,11 @@
   :hook
   (after-init-hook . global-company-mode))
 
+;; Better UI, but mostly to adjust for mixed-pitch's alignment issue
+(use-package company-box
+  :hook
+  (company-mode . company-box-mode))
+
 ;; Enhance the ordeing of things
 (use-package orderless
   :ensure t
