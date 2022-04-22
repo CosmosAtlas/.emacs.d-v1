@@ -1,6 +1,10 @@
 ;; Inspired by Emacs from Scratch
 ;; https://www.youtube.com/watch?v=74zOY-vgkyw&list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ
 
+;;
+;; Startup configurations
+;;
+
 (setq inhibit-startup-message t) ; Start with a blank screen
 
 ;; Tweaks UI to be ultra clean
@@ -15,7 +19,7 @@
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
 ;;
-;; System specific configurations
+;; Per system specific configurations
 ;;
 
 (load-file (expand-file-name
@@ -24,12 +28,18 @@
 		  (t "default-system.el"))
 	    user-emacs-directory))
 
+;;
+;; General configurations
+;; -- Configurations here are built-in emacs
+;;
+
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 ;; Always UTF-8
 (set-language-environment "UTF-8")
 
+;; manage temp files centrally
 (setq
  backup-by-copying t
  backup-directory-alist
@@ -39,28 +49,13 @@
  kept-old-versions 2
  version-control t)
 
-;; Package management setup
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
-
 ;; Line numbers
 (column-number-mode)
 (global-display-line-numbers-mode t)
 
-;; [fixme] don't highlight lines over X chars -- caused by whitespace mode, not in effect after deleting it
-;; whitespace mode interferes with org-mode variable font, it'll treat spaces in pitched font as variable font and produce very strange spacing.
-;; [fixme] highlight the textwidth column
+;; Disable line numbers for some modes
+(dolist (mode '(term-mode-hook eshell-mode-hook))
+  (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 ;; Always enable visual line (i.e., line wrap)
 (global-visual-line-mode 1)
@@ -77,16 +72,46 @@
 	    (lambda () (setq show-trailing-whitespace nil))))
 
 
-(use-package highlight-indent-guides)
-(setq highlight-indent-guides-method 'column)
-;; [fixme] Should load after whitespace mode
-(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+(defun cz/edit-user-init-file ()
+  "Edit the `user-init-file'"
+  (interactive)
+  (find-file user-init-file))
 
-;; Disable line numbers for some modes
-(dolist (mode '(term-mode-hook eshell-mode-hook))
-  (add-hook mode(lambda () (display-line-numbers-mode 0))))
+;;
+;; Configure packages
+;;
 
-;; Use evil mode first so I don't get lost...
+;; Set up package systems
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Initialize use-package on non-Linux platforms
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
+(require 'use-package)
+(setq use-package-always-ensure t)
+
+;; auto update packages
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-deleted-old-versions t)
+  (setq auto-package-update-hide-results t)
+  (auto-package-update-maybe))
+
+;; End of package system setup
+
+;;
+;; List of packages and configurations
+;;
+
+;;
+;; Configure Evil Mode
+;;
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -98,7 +123,6 @@
   (evil-set-undo-system 'undo-redo)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-  (define-key evil-motion-state-map (kbd "RET") nil)
 
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
@@ -117,12 +141,17 @@
   :config
   (evil-commentary-mode))
 
+;; End of evil
+
+(use-package highlight-indent-guides
+  :custom
+  (highlight-indent-guides-method 'column)
+  :hook
+  (prog-mode-hook . highlight-indent-guides-mode))
+
 (use-package command-log-mode)
 
-;; restart-emacs
-(use-package restart-emacs
-  :init
-  (setq restart-emacs-restore-frames t))
+(use-package restart-emacs)
 
 (use-package minimap
   :init
@@ -178,12 +207,9 @@
 
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130))
 
-(use-package org-roam
-  :custom
-  (org-roam-db-autosync-mode))
 
 ;;
-;; Org Mode Configuration ------------------------------------------------------
+;; Org Mode Configuration
 ;;
 
 ;; Configure org-mode
@@ -217,11 +243,15 @@
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
-
 (use-package org
-  :hook (org-mode . cz/org-mode-setup)
+  :hook
+  (org-mode . cz/org-mode-setup)
+  (auto-save-hook . org-save-all-org-buffers)
+  :custom
+  (org-default-notes-file (concat org-directory "/notes.org"))
   :config
   (setq org-ellipsis " ▾")
+  ;; Basically conseal in vim
   (setq org-hide-emphasis-markers t)
   (cz/org-font-setup))
 
@@ -240,8 +270,17 @@
 	visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory (file-truename (concat org-directory "/org-roam-test")))
+  :config
+  (setq org-roam-completion-everywhere t)
+  (org-roam-db-autosync-mode))
+
 ;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family
 ;; and ignores :fontset. Leading to some undesirable results : (
+;; currently hacked by overloading default fontset
 (use-package mixed-pitch
   :hook
   (text-mode . mixed-pitch-mode))
@@ -286,26 +325,23 @@
 
 (use-package doom-themes
   :ensure t
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t
-	doom-themes-enable-italic t)
   (load-theme 'doom-material-dark t)
-
   (doom-themes-org-config))
 
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package which-key
-  :init (which-key-mode)
-  :diminish which-key-mode
-  :config
-  (setq which-key-idle-delay 0.3))
-
-(use-package ivy-rich
   :init
-  (ivy-rich-mode 1))
+  (which-key-mode)
+  :diminish which-key-mode
+  :custom
+  (which-key-idle-delay 0.3))
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
@@ -319,10 +355,17 @@
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable)
   :bind
+  ("C-c C-d" . helpful-at-point)
   ([remap describe-function] . counsel-describe-function)
   ([remap describe-command] . helpful-command)
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
+
+(use-package link-hint
+  :ensure t
+  :defer t
+  :config
+  (define-key evil-normal-state-map (kbd "SPC f") 'link-hint-open-link))
 
 (use-package general
   :config
@@ -343,33 +386,15 @@
 (cosmos/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
-(defun edit-user-init-file ()
-  "Edit the `user-init-file'"
-  (interactive)
-  (find-file user-init-file))
-
-
 (use-package magit
   :commands (magit-status magit-get-current-branch)
+  :bind
+  ("C-x g" . magit-status)
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 (use-package all-the-icons
   :if (display-graphic-p))
-
-;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
-
-;; Custom keymappings
-(cosmos/leader-keys
-  "ed" (lambda() (interactive) (find-file user-init-file))
-  "t" '(:ignore t :which-key "toggles")
-  "p" 'projectile-command-map
-  "of" 'org-roam-node-find
-  "oc" 'org-roam-capture
-  "oi" 'org-roam-node-insert
-  "tt" '(counsel-load-theme :which-key "choose theme")
-  "bb" 'counsel-switch-buffer)
 
 (use-package projectile
   :ensure t
@@ -391,6 +416,10 @@
   :after elfeed
   :config
   (elfeed-protocol-enable)
+  :bind
+  :map elfeed-search-mode-map
+  ("ga" . cz/elfeed-mark-cursor-read)
+  ("gA" . cz/elfeed-all-read-refresh)
   :custom
   (elfeed-use-curl t)
   (elfeed-set-timeout 36000)
@@ -399,24 +428,6 @@
 		 (list "ttrss+http://admin@192.168.2.130:181"
 		       :api-url "http://admin@192.168.2.130:181"
 		       :password (shell-command-to-string "gopass -o freshrss")))))
-
-(defun elfeed-mark-all-as-read ()
-  (interactive)
-  (mark-whole-buffer)
-  (elfeed-search-untag-all-unread))
-
-(defun cz/elfeed-all-read-refresh()
-  (interactive)
-  (when (y-or-n-p "Really mark all items as read?")
-    (elfeed-mark-all-as-read)
-    (elfeed-serch-fetch nil)))
-
-;; auto update packages
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-deleted-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
 
 ;;
 ;; autocompletion setup
@@ -428,6 +439,28 @@
   :hook
   (after-init-hook . global-company-mode))
 
-;; use seprate custom file
+;; Enhance the ordeing of things
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-override '((file (styles basic partial-completion)))))
+
+;;
+;; Finalizing settings after plugins
+;;
+
+;; Custom keymappings
+(cosmos/leader-keys
+  "ed" 'cz/edit-user-init-file
+  "t" '(:ignore t :which-key "toggles")
+  "p" 'projectile-command-map
+  "of" 'org-roam-node-find
+  "oc" 'org-roam-capture
+  "oi" 'org-roam-node-insert
+  "tt" '(counsel-load-theme :which-key "choose theme")
+  "bb" 'counsel-switch-buffer)
+
+;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
