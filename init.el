@@ -426,10 +426,9 @@
   (elfeed-use-curl t)
   (elfeed-set-timeout 36000)
   (elfeed-log-level 'debug)
-  (elfeed-feeds (list
-		 (list "fever+http://cosmos@192.168.2.130:50180"
-		       :api-url "http://cosmos@192.168.2.130:50180/api/fever.php"
-		       :password (shell-command-to-string "gopass -o freshrss"))))
+  (elfeed-feeds '(("fever+http://cosmos@192.168.2.130:50180"
+		   :api-url "http://cosmos@192.168.2.130:50180/api/fever.php"
+		   :password (shell-command-to-string "gopass -o freshrss")))))
 
 ;;
 ;; autocompletion setup
