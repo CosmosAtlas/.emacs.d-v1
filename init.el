@@ -39,16 +39,6 @@
 ;; Always UTF-8
 (set-language-environment "UTF-8")
 
-;; manage temp files centrally
-(setq
- backup-by-copying t
- backup-directory-alist
- '(("." . "~/.saves/"))
- delete-old-versions t
- kept-new-versions 6
- kept-old-versions 2
- version-control t)
-
 ;; Line numbers
 (column-number-mode)
 (global-display-line-numbers-mode t)
@@ -84,7 +74,7 @@
 ;; Set up package systems
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+
 (package-initialize)
 (unless package-archive-contents
   (package-refresh-contents))
@@ -102,6 +92,20 @@
   (setq auto-package-update-deleted-old-versions t)
   (setq auto-package-update-hide-results t)
   (auto-package-update-maybe))
+
+(use-package quelpa)
+(use-package quelpa-use-package)
+
+(use-package frame-fns
+  :quelpa (frame-fns :fetcher github :repo "emacsmirror/frame-fns"))
+
+(use-package frame-cmds
+  :after frame-fns
+  :quelpa (frame-cmds :fetcher github :repo "emacsmirror/frame-cmds"))
+
+(use-package zoom-frm
+  :after (frame-cmds frame-fns)
+  :quelpa (zoom-frm :fetcher github :repo "emacsmirror/zoom-frm"))
 
 ;; End of package system setup
 
@@ -168,6 +172,15 @@
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
 
+(use-package no-littering
+  :custom
+  ;; may require restart or manually creating the dir for it to work
+  (auto-save-file-name-transforms
+   `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
+
+;; [fixme] explore after emacs 28.1
+;; (use-package vundo)
+
 ;;
 ;; Font settings generic
 ;;
@@ -181,31 +194,29 @@
     (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
 			charset
-			(font-spec :family "Sarasa Term SC" :height 130)))
+			(font-spec :family "Sarasa Term SC")))
 
     (create-fontset-from-fontset-spec
     (font-xlfd-name
-    (font-spec :family "ETBembo"
-		:height 130
+     (font-spec :family "ETBembo"
 		:registry "fontset-myvariable")))
 
     (set-fontset-font
     "fontset-myvariable"
-    'han (font-spec :family "FZPingXianYaSongS-R-GB" :height 130))
+    'han (font-spec :family "FZPingXianYaSongS-R-GB"))
 
     (create-fontset-from-fontset-spec
     (font-xlfd-name
-    (font-spec :family "Iosevka"
-		:height 130
+     (font-spec :family "Iosevka"
 		:registry "fontset-mypitch")))
 
     (set-fontset-font
     "fontset-mypitch"
-    'han (font-spec :family "Sarasa Term SC" :height 130))
+    'han (font-spec :family "Sarasa Term SC"))
 
-    (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 130)
+    (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 1.0)
 
-    (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 130))
+    (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0))
 
 
 ;;
@@ -270,6 +281,7 @@
 	visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
+;; [fixme] explore org-roam-ui
 (use-package org-roam
   :ensure t
   :custom
@@ -286,7 +298,8 @@
   (text-mode . mixed-pitch-mode))
 
 (use-package visual-fill-column
-  :hook (org-mode . cz/org-mode-visual-fill))
+  :hook
+  (org-mode . cz/org-mode-visual-fill))
 
 (with-eval-after-load "ispell"
   (setq ispell-program-name "aspell")
@@ -385,8 +398,9 @@
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
+  ("j" zoom-in "in")
+  ("k" zoom-out "out")
+  ("r" (zoom-in/out 0) "reset")
   ("f" nil "finished" :exit t))
 
 (cosmos/leader-keys
@@ -426,8 +440,8 @@
   (elfeed-use-curl t)
   (elfeed-set-timeout 36000)
   (elfeed-log-level 'debug)
-  (elfeed-feeds '(("fever+http://cosmos@192.168.2.130:50180"
-		   :api-url "http://cosmos@192.168.2.130:50180/api/fever.php"
+  (elfeed-feeds '(("ttrss+http://admin@192.168.2.130:181"
+		   :api-url "http://admin@192.168.2.130:181"
 		   :password (shell-command-to-string "gopass -o freshrss")))))
 
 ;;
