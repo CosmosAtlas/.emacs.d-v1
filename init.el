@@ -178,8 +178,7 @@
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
-;; [fixme] explore after emacs 28.1
-;; (use-package vundo)
+(use-package vundo)
 
 ;;
 ;; Font settings generic
