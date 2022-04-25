@@ -256,14 +256,14 @@
 (use-package org
   :hook
   (org-mode . cz/org-mode-setup)
+  (org-mode . cz/org-font-setup)
   (auto-save-hook . org-save-all-org-buffers)
   :custom
   (org-default-notes-file (concat org-directory "/notes.org"))
   :config
   (setq org-ellipsis " ▾")
   ;; Basically conseal in vim
-  (setq org-hide-emphasis-markers t)
-  (cz/org-font-setup))
+  (setq org-hide-emphasis-markers t))
 
 (use-package org-bullets
   :after org
@@ -479,6 +479,7 @@
   "oi" 'org-roam-node-insert
   "tt" '(counsel-load-theme :which-key "choose theme")
   "bb" 'counsel-switch-buffer)
+
 
 ;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
