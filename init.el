@@ -289,6 +289,28 @@
   (setq org-roam-completion-everywhere t)
   (org-roam-db-autosync-mode))
 
+(use-package org-ref)
+
+(use-package org-roam-bibtex
+  :after org-roam org-ref)
+
+(setq orb-preformat-keywords '("citekey" "author" "date"))
+(setq org-roam-capture-templates
+      '(("d" "default" plain "%?"
+	 :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+			    "#+title: ${title}\n")
+	 :unnarrowed t)
+	("r" "bibliography reference" plain "%?"
+         :target
+         (file+head "references/${citekey}.org" "#+title: ${title}\n")
+         :unnarrowed t)))
+
+(use-package ivy-bibtex
+  :after ivy
+  :config
+  (setq bibtex-completion-bibliography
+   (list (file-truename (concat org-directory "/zotero.bib")))))
+
 ;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family
 ;; and ignores :fontset. Leading to some undesirable results : (
 ;; currently hacked by overloading default fontset
