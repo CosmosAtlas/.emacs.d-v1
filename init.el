@@ -223,7 +223,6 @@
 
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0))
 
-
 ;;
 ;; Org Mode Configuration
 ;;
@@ -294,10 +293,17 @@
   (setq org-roam-completion-everywhere t)
   (org-roam-db-autosync-mode))
 
-(use-package org-ref)
+(use-package org-ref
+  :after org
+  :config
+  (setq org-ref-default-biblography (list (file-truename (concat org-directory "/zotero.bib")))))
 
 (use-package org-roam-bibtex
-  :after org-roam org-ref)
+  :after org-roam org-ref ivy-bibtex
+  :hook
+  (org-mode . org-roam-bibtex-mode)
+  :custom
+  (orb-insert-interface 'ivy-bibtex))
 
 (setq orb-preformat-keywords '("citekey" "author" "date"))
 (setq org-roam-capture-templates
@@ -310,11 +316,9 @@
          (file+head "references/${citekey}.org" "#+title: ${title}\n")
          :unnarrowed t)))
 
-(use-package ivy-bibtex
-  :after ivy
-  :config
-  (setq bibtex-completion-bibliography
-   (list (file-truename (concat org-directory "/zotero.bib")))))
+(defun cz/org-id-update-roam-locations ()
+  (interactive)
+  (org-id-update-id-locations (org-roam--list-files org-roam-directory)))
 
 ;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family
 ;; and ignores :fontset. Leading to some undesirable results : (
@@ -361,6 +365,14 @@
 (use-package ivy-rich
   :init
   (ivy-rich-mode 1))
+
+(use-package ivy-bibtex
+  :after ivy ivy-rich
+  :custom
+  (ivy-bibtex-default-action 'ivy-bibtex-insert-key)
+  :config
+  (setq bibtex-completion-bibliography
+   (list (file-truename (concat org-directory "/zotero.bib")))))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -492,14 +504,15 @@
 ;; Custom keymappings
 (cosmos/leader-keys
   "ed" 'cz/edit-user-init-file
-  "t" '(:ignore t :which-key "toggles")
   "p" 'projectile-command-map
   "of" 'org-roam-node-find
   "oc" 'org-roam-capture
   "oi" 'org-roam-node-insert
+  "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
   "bb" 'counsel-switch-buffer)
 
+(evil-define-key 'normal 'org-mode-map " ob" 'ivy-bibtex)
 
 ;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
