@@ -15,7 +15,7 @@
 (menu-bar-mode -1)   ; Disable the menu bar
 
 ;; Completely turn off bells
-(setq visible-bell nil)   ; Visual bell
+(setq visible-bell nil)           ; Visual bell
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
 ;;
@@ -144,6 +144,13 @@
   :after evil
   :config
   (evil-commentary-mode))
+
+(use-package evil-lion
+  :custom
+  (evil-lion-left-align-key (kbd "ga"))
+  (evil-lion-right-align-key (kbd "gA"))
+  :config
+  (evil-lion-mode))
 
 ;; End of evil
 
