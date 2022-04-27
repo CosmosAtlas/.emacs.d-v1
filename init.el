@@ -174,7 +174,6 @@
   (global-git-gutter-mode +1))
 
 (use-package dashboard
-  :ensure t
   :config
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))))
@@ -289,7 +288,6 @@
 
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
-  :ensure t
   :custom
   (org-roam-directory (file-truename (concat org-directory "/org-roam-test")))
   :config
@@ -340,7 +338,6 @@
 ;;
 
 (use-package markdown-mode
-  :ensure t
   :commands (markdown-mode gfm-mode))
 
 ;; [fixme] automated popups
@@ -366,12 +363,10 @@
   (ivy-rich-mode 1))
 
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
 (use-package doom-themes
-  :ensure t
   :custom
   (doom-themes-enable-bold t)
   (doom-themes-enable-italic t)
@@ -409,7 +404,6 @@
   ([remap describe-key] . helpful-key))
 
 (use-package link-hint
-  :ensure t
   :defer t
   :config
   (define-key evil-normal-state-map (kbd "SPC f") 'link-hint-open-link))
@@ -445,7 +439,6 @@
   :if (display-graphic-p))
 
 (use-package projectile
-  :ensure t
   :init
   (projectile-mode +1)
   :bind (:map projectile-mode-map
@@ -459,7 +452,6 @@
 
 ;; [fixme] try to load read items
 (use-package elfeed-protocol
-  :ensure t
   :demand t
   :after elfeed
   :config
@@ -489,7 +481,6 @@
 
 ;; Enhance the ordeing of things
 (use-package orderless
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-override '((file (styles basic partial-completion)))))
