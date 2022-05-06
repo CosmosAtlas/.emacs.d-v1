@@ -67,6 +67,11 @@
   (interactive)
   (find-file user-init-file))
 
+(defun cz/edit-org-inbox-file ()
+  "Edit the inbox file in org"
+  (interactive)
+  (find-file (file-truename (concat org-directory "/inbox.org"))))
+
 ;;
 ;; Configure packages
 ;;
@@ -151,6 +156,14 @@
   (evil-lion-right-align-key (kbd "gA"))
   :config
   (evil-lion-mode))
+
+(use-package evil-org
+  :ensure t
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
 ;; End of evil
 
@@ -265,6 +278,12 @@
   (auto-save-hook . org-save-all-org-buffers)
   :custom
   (org-default-notes-file (concat org-directory "/notes.org"))
+  (org-agenda-files (list (concat org-directory "/gtd.org")
+			  (concat org-directory "/misc.org")
+			  (concat org-directory "/inbox.org")))
+  (org-capture-templates
+   `(("i" "inbox" entry (file ,(concat org-directory "/inbox.org")) "* TODO %?")))
+  (org-log-done 'time)
   :config
   (setq org-ellipsis " ▾")
   ;; Basically conseal in vim
@@ -504,13 +523,16 @@
 ;; Custom keymappings
 (cosmos/leader-keys
   "ed" 'cz/edit-user-init-file
+  "ei" 'cz/edit-org-inbox-file
   "p" 'projectile-command-map
-  "of" 'org-roam-node-find
-  "oc" 'org-roam-capture
-  "oi" 'org-roam-node-insert
+  "zf" 'org-roam-node-find
+  "zc" 'org-roam-capture
+  "zi" 'org-roam-node-insert
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
-  "bb" 'counsel-switch-buffer)
+  "bb" 'counsel-switch-buffer
+  "oa" 'org-agenda
+  "oc" 'org-capture)
 
 (evil-define-key 'normal 'org-mode-map " ob" 'ivy-bibtex)
 
