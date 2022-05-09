@@ -72,6 +72,11 @@
   (interactive)
   (find-file (file-truename (concat org-directory "/inbox.org"))))
 
+(defun cz/edit-org-gtd-file ()
+  "Edit the inbox file in org"
+  (interactive)
+  (find-file (file-truename (concat org-directory "/gtd.org"))))
+
 ;;
 ;; Configure packages
 ;;
@@ -280,9 +285,13 @@
   (org-default-notes-file (concat org-directory "/notes.org"))
   (org-agenda-files (list (concat org-directory "/gtd.org")
 			  (concat org-directory "/misc.org")
+			  (concat org-directory "/done.org")
 			  (concat org-directory "/inbox.org")))
+  (org-refile-targets
+   '((nil :maxlevel . 3)
+     (org-agenda-files :maxlevel . 3)))
   (org-capture-templates
-   `(("i" "inbox" entry (file ,(concat org-directory "/inbox.org")) "* TODO %?")))
+   `(("i" "inbox" entry (file ,(concat org-directory "/inbox.org")) "** TODO %?")))
   (org-log-done 'time)
   :config
   (setq org-ellipsis " ▾")
@@ -491,8 +500,8 @@
   (elfeed-use-curl t)
   (elfeed-set-timeout 36000)
   (elfeed-log-level 'debug)
-  (elfeed-feeds '(("ttrss+http://admin@192.168.2.130:181"
-		   :api-url "http://admin@192.168.2.130:181"
+  (elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
+		   :api-url "http://admin@192.168.1.104:181"
 		   :password (shell-command-to-string "gopass -o freshrss")))))
 
 ;;
@@ -523,7 +532,8 @@
 ;; Custom keymappings
 (cosmos/leader-keys
   "ed" 'cz/edit-user-init-file
-  "ei" 'cz/edit-org-inbox-file
+  "eti" 'cz/edit-org-inbox-file
+  "etg" 'cz/edit-org-gtd-file
   "p" 'projectile-command-map
   "zf" 'org-roam-node-find
   "zc" 'org-roam-capture
