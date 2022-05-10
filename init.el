@@ -371,6 +371,7 @@
   (ivy-mode 1))
 
 (use-package ivy-rich
+  :after ivy
   :init
   (ivy-rich-mode 1))
 
@@ -435,12 +436,13 @@
     :prefix "SPC"
     :global-prefix "C-SPC"))
 
-
 ;; Zooming emacs frame globally
 (straight-use-package 'frame-fns)
+(require 'frame-fns)
 (straight-use-package 'frame-cmds)
+(require 'frame-cmds)
 (straight-use-package 'zoom-frm)
-
+(require 'zoom-frm)
 
 ;; Dynamically change font size via hydra
 (use-package hydra)
@@ -535,4 +537,6 @@
 
 ;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
+;; create the custom file if it does not exist
+(write-region "" nil custom-file)
 (load custom-file)
