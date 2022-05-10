@@ -81,41 +81,21 @@
 ;; Configure packages
 ;;
 
-;; Set up package systems
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
-
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-  (package-install 'use-package))
-
-(require 'use-package)
-(setq use-package-always-ensure t)
-
-;; auto update packages
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-deleted-old-versions t)
-  (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
-
-(use-package quelpa)
-(use-package quelpa-use-package)
-
-(use-package frame-fns
-  :quelpa (frame-fns :fetcher github :repo "emacsmirror/frame-fns"))
-
-(use-package frame-cmds
-  :after frame-fns
-  :quelpa (frame-cmds :fetcher github :repo "emacsmirror/frame-cmds"))
-
-(use-package zoom-frm
-  :after (frame-cmds frame-fns)
-  :quelpa (zoom-frm :fetcher github :repo "emacsmirror/zoom-frm"))
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
 
 ;; End of package system setup
 
@@ -450,10 +430,17 @@
 
 (use-package general
   :config
-  (general-create-definer cosmos/leader-keys
+  (general-create-definer cz/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC"))
+
+
+;; Zooming emacs frame globally
+(straight-use-package 'frame-fns)
+(straight-use-package 'frame-cmds)
+(straight-use-package 'zoom-frm)
+
 
 ;; Dynamically change font size via hydra
 (use-package hydra)
@@ -465,7 +452,7 @@
   ("r" (zoom-in/out 0) "reset")
   ("f" nil "finished" :exit t))
 
-(cosmos/leader-keys
+(cz/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 (use-package magit
@@ -530,7 +517,7 @@
 ;;
 
 ;; Custom keymappings
-(cosmos/leader-keys
+(cz/leader-keys
   "ed" 'cz/edit-user-init-file
   "eti" 'cz/edit-org-inbox-file
   "etg" 'cz/edit-org-gtd-file
