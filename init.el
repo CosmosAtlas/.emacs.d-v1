@@ -18,6 +18,10 @@
 (setq visible-bell nil)           ; Visual bell
 (setq ring-bell-function 'ignore) ; Annoying sound bell
 
+;; scrolling
+(setq scroll-margin 2)
+(global-hl-line-mode 1)
+
 ;;
 ;; Per system specific configurations
 ;;
