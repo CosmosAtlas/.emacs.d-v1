@@ -295,6 +295,7 @@
 
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
+  :after org
   :custom
   (org-roam-directory (file-truename (concat org-directory "/org-roam-test")))
   :config
@@ -302,12 +303,12 @@
   (org-roam-db-autosync-mode))
 
 (use-package org-ref
-  :after org
+  :after org org-roam
   :config
   (setq org-ref-default-biblography (list (file-truename (concat org-directory "/zotero.bib")))))
 
 (use-package org-roam-bibtex
-  :after org-roam org-ref ivy-bibtex
+  :after org org-roam org-ref ivy-bibtex
   :hook
   (org-mode . org-roam-bibtex-mode)
   :custom
