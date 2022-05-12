@@ -498,22 +498,24 @@
 ;; autocompletion setup
 ;;
 
-(use-package company
+(use-package corfu
   :init
-  (global-company-mode)
-  :hook
-  (after-init-hook . global-company-mode))
+  (global-corfu-mode)
+  :config
+  (setq corfu-auto t
+	corfu-quit-no-match 'separator))
 
-;; Better UI, but mostly to adjust for mixed-pitch's alignment issue
-(use-package company-box
-  :hook
-  (company-mode . company-box-mode))
+(use-package emacs
+  :init
+  (setq completion-cycle-threshold 3)
+  (setq tab-always-indent 'complete))
 
 ;; Enhance the ordeing of things
 (use-package orderless
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-override '((file (styles basic partial-completion)))))
+  :init
+  (setq completion-styles '(orderless basic)
+	completion-category-defaults nil
+	completion-category-override '((file (styles basic partial-completion)))))
 
 ;;
 ;; Finalizing settings after plugins
