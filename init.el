@@ -484,7 +484,6 @@
   :bind
   ("C-x w" . elfeed))
 
-;; [fixme] try to load read items
 (use-package elfeed-protocol
   :demand t
   :after elfeed
@@ -497,6 +496,12 @@
   (elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
 		   :api-url "http://admin@192.168.1.104:181"
 		   :password (shell-command-to-string "gopass -o freshrss")))))
+
+(use-package ebuku
+  :after evil-collection
+  :config
+  (add-to-list 'evil-collection-mode-list 'ebuku)
+  (evil-collection-init 'ebuku))
 
 ;;
 ;; autocompletion setup
