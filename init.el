@@ -275,7 +275,7 @@
    '((nil :maxlevel . 3)
      (org-agenda-files :maxlevel . 3)))
   (org-capture-templates
-   `(("i" "inbox" entry (file ,(concat org-directory "/inbox.org")) "** TODO %?")))
+   `(("i" "inbox" entry (file+headline ,(concat org-directory "/inbox.org") "Tasks") "** TODO %?")))
   (org-log-done 'time)
   :config
   (setq org-ellipsis " ▾")
