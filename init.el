@@ -304,6 +304,8 @@
   (org-roam-directory (file-truename (concat org-directory "/org-roam-test")))
   :config
   (setq org-roam-completion-everywhere t)
+  ;; run sync at startup
+  (org-roam-db-sync)
   (org-roam-db-autosync-mode))
 
 (use-package org-ref
