@@ -364,6 +364,7 @@
 	 :map ivy-minibuffer-map
 	 ("TAB" . ivy-alt-done)
 	 ("C-l" . ivy-alt-done)
+	 ("C-<return>" . ivy-immediate-done)
 	 ("C-j" . ivy-next-line)
 	 :map ivy-switch-buffer-map
 	 ("C-k" . ivy-previous-line)
@@ -532,16 +533,26 @@
 
 ;; Custom keymappings
 (cz/leader-keys
+  ;; editor behavior
+  "bb" 'counsel-switch-buffer
+  ;; file edit short cuts
   "ed" 'cz/edit-user-init-file
   "eti" 'cz/edit-org-inbox-file
   "etg" 'cz/edit-org-gtd-file
+  ;; launch apps
+  "lg" 'magit
+  "le" 'ebuku
+  "lr" 'elfeed
+  ;; projectile
   "p" 'projectile-command-map
+  ;; zettelkasten related
   "zf" 'org-roam-node-find
   "zc" 'org-roam-capture
   "zi" 'org-roam-node-insert
+  ;; toggles
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
-  "bb" 'counsel-switch-buffer
+  ;; global org
   "oa" 'org-agenda
   "oc" 'org-capture)
 
