@@ -210,7 +210,7 @@
 
     (set-fontset-font
     "fontset-myvariable"
-    'han (font-spec :family "FZPingXianYaSongS-R-GB"))
+    'han (font-spec :family "FZPingXianYaSong-R-GBK"))
 
     (create-fontset-from-fontset-spec
     (font-xlfd-name
@@ -305,7 +305,6 @@
   :config
   (setq org-roam-completion-everywhere t)
   ;; run sync at startup
-  (org-roam-db-sync)
   (org-roam-db-autosync-mode))
 
 (use-package org-ref
@@ -502,6 +501,8 @@
 
 (use-package ebuku
   :after evil-collection
+  :custom
+  (ebuku-database-path (concat org-directory "/bookmarks.db"))
   :config
   (add-to-list 'evil-collection-mode-list 'ebuku)
   (evil-collection-init 'ebuku))
@@ -542,9 +543,9 @@
   "eti" 'cz/edit-org-inbox-file
   "etg" 'cz/edit-org-gtd-file
   ;; launch apps
-  "lg" 'magit
-  "le" 'ebuku
-  "lr" 'elfeed
+  "xg" 'magit
+  "xe" 'ebuku
+  "xr" 'elfeed
   ;; projectile
   "p" 'projectile-command-map
   ;; zettelkasten related
