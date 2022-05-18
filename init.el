@@ -500,12 +500,9 @@
 		   :password (shell-command-to-string "gopass -o freshrss")))))
 
 (use-package ebuku
-  :after evil-collection
+  :after evil-collection org
   :custom
-  (ebuku-database-path (concat org-directory "/bookmarks.db"))
-  :config
-  (add-to-list 'evil-collection-mode-list 'ebuku)
-  (evil-collection-init 'ebuku))
+  (ebuku-database-path (file-truename (concat org-directory "/bookmarks.db"))))
 
 ;;
 ;; autocompletion setup
