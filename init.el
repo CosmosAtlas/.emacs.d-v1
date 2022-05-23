@@ -305,7 +305,9 @@
   :config
   (setq org-roam-completion-everywhere t)
   ;; run sync at startup
-  (org-roam-db-autosync-mode))
+  (org-roam-db-autosync-mode)
+  ;; auto sync once
+  (org-roam-db-sync))
 
 (use-package org-ref
   :after org org-roam
@@ -503,6 +505,8 @@
   :after evil-collection org
   :custom
   (ebuku-database-path (file-truename (concat org-directory "/bookmarks.db"))))
+
+(use-package fanyi)
 
 ;;
 ;; autocompletion setup
