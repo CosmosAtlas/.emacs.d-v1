@@ -300,14 +300,12 @@
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
   :after org
-  :custom
-  (org-roam-directory (file-truename (concat org-directory "/org-roam-test")))
   :config
+  (setq org-roam-directory
+	(file-truename (concat org-directory "/org-roam-test")))
   (setq org-roam-completion-everywhere t)
   ;; run sync at startup
-  (org-roam-db-autosync-mode)
-  ;; auto sync once
-  (org-roam-db-sync))
+  (org-roam-db-autosync-mode))
 
 (use-package org-ref
   :after org org-roam
