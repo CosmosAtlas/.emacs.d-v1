@@ -490,14 +490,19 @@
   :demand t
   :after elfeed
   :config
-  (elfeed-protocol-enable)
-  :custom
-  (elfeed-use-curl t)
-  (elfeed-set-timeout 36000)
-  (elfeed-log-level 'debug)
-  (elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
+  (setq elfeed-use-curl t)
+  (setq elfeed-set-timeout 36000)
+  (setq elfeed-curl-extra-arguments '("--insecure"))
+  (setq elfeed-protocol-log-trace t)
+  (setq elfeed-log-level 'debug)
+  (setq elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
 		   :api-url "http://admin@192.168.1.104:181"
-		   :password (shell-command-to-string "gopass -o freshrss")))))
+		   :password (shell-command-to-string "gopass -o freshrss"))
+		  ("fever+http://cosmos@cosmos547.com:50180"
+		   :api-url "http://cosmos@cosmos547.com:50180/api/fever.php"
+		   :password (shell-command-to-string "gopass -o hyperion"))))
+  (setq elfeed-protocol-enabled-protocols '(fever ttrss))
+  (elfeed-protocol-enable))
 
 (use-package ebuku
   :after evil-collection org
