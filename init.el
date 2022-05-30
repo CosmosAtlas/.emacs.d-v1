@@ -99,7 +99,11 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+
+(use-package straight
+  :custom
+  (straight-use-package-by-default t))
+
 
 ;; End of package system setup
 
@@ -300,6 +304,7 @@
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
   :after org
+  :defer t
   :config
   (setq org-roam-directory
 	(file-truename (concat org-directory "/org-roam-test")))
@@ -491,7 +496,6 @@
   ("C-x w" . elfeed))
 
 (use-package elfeed-protocol
-  :demand t
   :after elfeed
   :config
   (setq elfeed-use-curl t)
@@ -499,17 +503,13 @@
   (setq elfeed-curl-extra-arguments '("--insecure"))
   (setq elfeed-protocol-log-trace t)
   (setq elfeed-log-level 'debug)
-  (setq elfeed-feeds '(
-		       ("ttrss+http://admin@192.168.1.104:181"
+  (setq elfeed-protocol-fever-update-unread-only t)
+  (setq elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
 		   :api-url "http://admin@192.168.1.104:181"
 		   :password (shell-command-to-string "gopass -o freshrss"))
-		  ;; ("fever+http://cosmos@cosmos547.com:50180"
-		  ;;  :api-url "http://cosmos@cosmos547.com:50180/api/fever.php"
-		  ;;  :password (shell-command-to-string "gopass -o hyperion"))
 		  ("fever+https://cosmos@cosmos547.com/miniflux/"
 		   :api-url "https://cosmos@cosmos547.com/miniflux/fever/"
-		   :password (shell-command-to-string "gopass -o hyperion"))
-		  ))
+		   :password (shell-command-to-string "gopass -o hyperion"))))
   (setq elfeed-protocol-enabled-protocols '(fever ttrss))
   (elfeed-protocol-enable))
 
