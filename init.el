@@ -309,6 +309,7 @@
   (setq org-roam-directory
 	(file-truename (concat org-directory "/org-roam-test")))
   (setq org-roam-completion-everywhere t)
+  (setq org-roam-node-display-template "${title} [${tags}]")
   ;; run sync at startup
   (org-roam-db-autosync-mode))
 
