@@ -192,6 +192,13 @@
 
 (use-package vundo)
 
+(use-package super-save
+  :config
+  (super-save-mode +1)
+  (setq super-save-auto-save-when-idle t)
+  ;; disable built-in autosave
+  (setq auto-save-default nil))
+
 ;;
 ;; Font settings generic
 ;;
@@ -268,7 +275,6 @@
   :hook
   (org-mode . cz/org-mode-setup)
   (org-mode . cz/org-font-setup)
-  (auto-save-hook . org-save-all-org-buffers)
   :custom
   (org-default-notes-file (concat org-directory "/notes.org"))
   (org-agenda-files (list (concat org-directory "/gtd.org")
