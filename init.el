@@ -40,9 +40,6 @@
 ;; Make ESC quit stuffs
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-;; Always UTF-8
-(set-language-environment "UTF-8")
-
 ;; Line numbers
 (column-number-mode)
 (global-display-line-numbers-mode t)
