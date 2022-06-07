@@ -535,6 +535,11 @@
   (setq corfu-auto t
 	corfu-quit-no-match 'separator))
 
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev))
+
 (use-package emacs
   :init
   (setq completion-cycle-threshold 3)
