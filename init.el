@@ -167,11 +167,6 @@
 
 (use-package restart-emacs)
 
-(use-package minimap
-  :init
-  (setq minimap-minimum-width 15)
-  (setq minimap-window-location 'right))
-
 (use-package git-gutter-fringe
   :config
   (global-git-gutter-mode +1))
@@ -537,6 +532,8 @@
 (use-package corfu
   :init
   (global-corfu-mode)
+  :bind (:map corfu-map
+	      ("RET" . nil))
   :config
   (setq corfu-auto t
 	corfu-quit-no-match 'separator))
@@ -557,6 +554,11 @@
   (setq completion-styles '(orderless basic)
 	completion-category-defaults nil
 	completion-category-override '((file (styles basic partial-completion)))))
+
+;; LSP related
+(use-package eglot
+  :hook
+  (python-mode-hook . eglot-ensure))
 
 ;;
 ;; Finalizing settings after plugins
