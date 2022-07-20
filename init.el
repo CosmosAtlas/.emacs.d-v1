@@ -196,6 +196,8 @@
   ;; disable built-in autosave
   (setq auto-save-default nil))
 
+(use-package crux)
+
 ;;
 ;; Font settings generic
 ;;
@@ -313,6 +315,10 @@
 	(file-truename (concat org-directory "/org-roam-test")))
   (setq org-roam-completion-everywhere t)
   (setq org-roam-node-display-template "${title} [${tags}]")
+  (setq org-roam-mode-sections
+	(list #'org-roam-backlinks-section
+	      #'org-roam-reflinks-section
+	      ))
   ;; run sync at startup
   (org-roam-db-autosync-mode))
 
@@ -573,7 +579,6 @@
   ;; zettelkasten related
   "zf" 'org-roam-node-find
   "zc" 'org-roam-capture
-  "zi" 'org-roam-node-insert
   ;; toggles
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
@@ -582,6 +587,9 @@
   "oc" 'org-capture)
 
 (evil-define-key 'normal 'org-mode-map " ob" 'ivy-bibtex)
+(evil-define-key 'normal 'org-mode-map " zi" 'org-roam-node-insert)
+(evil-define-key 'normal 'org-mode-map " zb" 'org-roam-buffer-toggle)
+(evil-define-key 'normal 'org-mode-map " zt" 'org-roam-tag-add)
 
 ;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
