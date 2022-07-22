@@ -51,6 +51,7 @@
 ;; Always enable visual line (i.e., line wrap)
 (global-visual-line-mode 1)
 
+;; Highlight spaces at end of line
 (setq-default show-trailing-whitespace t)
 (dolist (hook '(special-mode-hook
 		term-mode-hook
@@ -63,6 +64,9 @@
 	    (lambda () (setq show-trailing-whitespace nil))))
 
 
+;;
+;; My helper functions
+;;
 (defun cz/edit-user-init-file ()
   "Edit the `user-init-file'"
   (interactive)
@@ -79,7 +83,7 @@
   (find-file (file-truename (concat org-directory "/gtd.org"))))
 
 ;;
-;; Configure packages
+;; Configure packages {{{
 ;;
 
 (defvar bootstrap-version)
@@ -101,8 +105,7 @@
   :custom
   (straight-use-package-by-default t))
 
-
-;; End of package system setup
+;; End of package system setup }}}
 
 ;;
 ;; List of packages and configurations
@@ -111,6 +114,7 @@
 ;;
 ;; Configure Evil Mode
 ;;
+
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -182,6 +186,7 @@
   (auto-save-file-name-transforms
    `((".*" ,(no-littering-expand-var-file-name "auto-save/") t))))
 
+;; Undo history
 (use-package vundo)
 
 (use-package super-save
@@ -191,6 +196,7 @@
   ;; disable built-in autosave
   (setq auto-save-default nil))
 
+;; Helper utilities
 (use-package crux)
 
 ;;
@@ -231,7 +237,7 @@
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0))
 
 ;;
-;; Org Mode Configuration
+;; Org Mode Configuration {{{
 ;;
 
 ;; Configure org-mode
@@ -296,11 +302,6 @@
   :after org
   :hook (org-mode . org-autolist-mode))
 
-(defun cz/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-	visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
   :after org
@@ -351,19 +352,20 @@
   :hook
   (text-mode . mixed-pitch-mode))
 
+(defun cz/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
 (use-package visual-fill-column
   :hook
   (org-mode . cz/org-mode-visual-fill))
 
-(with-eval-after-load "ispell"
-  (setq ispell-program-name "aspell")
-  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC")))
-
-(add-hook 'org-mode-hook (lambda () (setq flyspell-mode 1)))
-
 ;;
-;; == End of Org-mode setup
+;; End of Org-mode setup }}}
 ;;
+
+;; [fixme] spell check
 
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode))
