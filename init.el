@@ -144,6 +144,7 @@
   :config
   (evil-commentary-mode))
 
+;; auto alignment
 (use-package evil-lion
   :custom
   (evil-lion-left-align-key (kbd "ga"))
@@ -158,6 +159,21 @@
   :config
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
+
+;; preview registers
+(use-package evil-owl
+  :config
+  (setq evil-owl-max-string-length 500)
+  (add-to-list 'display-buffer-alist
+	       '("*evil-owl*"
+		 (display-buffer-in-side-window)
+		 (side . bottom)
+		 (window-height . 0.3)))
+  (evil-owl-mode))
+
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
 ;; End of evil
 
@@ -580,6 +596,8 @@
   "xr" 'elfeed
   ;; projectile
   "p" 'projectile-command-map
+  ;; vundo
+  "ut" 'vundo
   ;; zettelkasten related
   "zf" 'org-roam-node-find
   "zc" 'org-roam-capture
