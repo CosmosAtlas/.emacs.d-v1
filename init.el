@@ -573,10 +573,36 @@
 	completion-category-defaults nil
 	completion-category-override '((file (styles basic partial-completion)))))
 
+;;
+;; Programming Setup
+;;
+
 ;; LSP related
 (use-package eglot
   :hook
   (python-mode-hook . eglot-ensure))
+
+;; LaTeX
+
+(use-package tex
+  :straight auctex
+  :config
+  (setq LaTeX-item-indent 0)
+  (setq TeX-PDF-mode t)
+  (eval-after-load
+      "tex" '(add-to-list 'TeX-command-list
+			  '("latexmk" "latexmk -pdf %t --synctex=1" TeX-run-TeX)))
+
+  (setq latex-run-command "pdflatex")
+  (setq LaTeX-command "latex --synctex=1")
+  (setq-default TeX-output-dir "build")
+
+  (setq TeX-auto-save t
+	TeX-parse-self t)
+
+  (add-hook 'LaTeX-mode-hook '(lambda () (reftex-mode))))
+
+(use-package gscholar-bibtex)
 
 ;;
 ;; Finalizing settings after plugins
