@@ -22,6 +22,9 @@
 (setq scroll-margin 2)
 (global-hl-line-mode 1)
 
+;; Always indent as spaces
+(setq-default indent-tabs-mode nil)
+
 ;;
 ;; Per system specific configurations
 ;;
@@ -582,6 +585,27 @@
 
 ;; Lua
 (use-package lua-mode)
+
+;; Common lisp
+(use-package slime
+  :config
+  (setq inferior-lisp-program "sbcl"))
+
+(defun cz/override-slime-del-key ()
+  (define-key slime-repl-mode-map
+    (read-kbd-macro paredit-backward-delete-key) nil))
+
+(use-package paredit
+  :after slime
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-interactive-mode-hook 'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'slime-repl-mode-hook 'enable-paredit-mode)
+  (add-hook 'slime-repl-mode-hook 'cz/override-slime-del-key))
+
 
 ;; LSP related
 (use-package eglot
