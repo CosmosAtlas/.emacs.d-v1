@@ -642,6 +642,9 @@
 (cz/leader-keys
   ;; editor behavior
   "bb" 'counsel-switch-buffer
+  "bk" 'kill-this-buffer
+  "bp" 'previous-buffer
+  "bn" 'next-buffer
   ;; file edit short cuts
   "ed" 'cz/edit-user-init-file
   "eti" 'cz/edit-org-inbox-file
