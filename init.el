@@ -630,7 +630,7 @@
   (setq TeX-auto-save t
 	TeX-parse-self t)
 
-  (add-hook 'LaTeX-mode-hook '(lambda () (reftex-mode))))
+  (add-hook 'LaTeX-mode-hook #'(lambda () (reftex-mode))))
 
 (use-package gscholar-bibtex)
 
