@@ -613,29 +613,12 @@
   (python-mode-hook . eglot-ensure))
 
 ;; LaTeX
-(defun guess-TeX-master (filename)
-  "Guess the master file for FILENAME from currently open .tex files."
-  (let ((candidate nil)
-        (filename (file-name-nondirectory filename)))
-    (save-excursion
-      (dolist (buffer (buffer-list))
-        (with-current-buffer buffer
-          (let ((name (buffer-name))
-                (file buffer-file-name))
-            (if (and file (string-match "\\.tex$" file))
-                (progn
-                  (goto-char (point-min))
-                  (if (re-search-forward (concat "\\\\input{" filename "}") nil t)
-                      (setq candidate file))
-                  (if (re-search-forward (concat "\\\\include{" (file-name-sans-extension filename) "}") nil t)
-                      (setq candidate file))))))))
-    (if candidate
-        (message "TeX master document: %s" (file-name-nondirectory candidate)))
-    candidate))
 
-(use-package pdf-tools
-  :config
-  (pdf-tools-install))
+;; Don't bother with PDF tools on windows
+(when (not (eq system-type 'windows-nt))
+  (use-package pdf-tools
+    :config
+    (pdf-tools-install)))
 
 (use-package tex
   :straight auctex
@@ -646,17 +629,16 @@
       "tex" '(add-to-list 'TeX-command-list
 			  '("latexmk" "latexmk -pdf %t --synctex=1" TeX-run-TeX)))
 
-  (eval-after-load
-      "tex" '(add-to-list 'TeX-view-program-selection
-			  '(output-pdf "PDF Tools")))
-  ;; (eval-after-load
-  ;;     "tex" '(add-to-list 'TeX-view-program-selection
-  ;;       		  '(output-pdf "Zathura")))
+  ;; Don't bother with PDF tools on windows
+  (when (not (eq system-type 'windows-nt))
+    (eval-after-load
+        "tex" '(add-to-list 'TeX-view-program-selection
+			    '(output-pdf "PDF Tools"))))
 
   (setq latex-run-command "pdflatex")
   (setq LaTeX-command "latex --synctex=1")
   (setq-default TeX-output-dir "build")
-  (setq-default TeX-master (guess-TeX-master (buffer-file-name)))
+  (setq-default TeX-master nil)
 
   (setq TeX-auto-save t
 	TeX-parse-self t
