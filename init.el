@@ -645,6 +645,9 @@
   (setq-default TeX-output-dir "build")
   (setq-default TeX-master nil)
 
+  ;; Allow evaluation of setting TeX-master by my own default
+  (add-to-list 'safe-local-eval-forms '(setq TeX-master (format "%s/main" (file-name-directory (locate-dominating-file default-directory ".dir-locals.el")))))
+
   (setq TeX-auto-save t
 	TeX-parse-self t
         TeX-source-correlate-start-server t)
