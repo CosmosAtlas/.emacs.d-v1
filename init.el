@@ -309,10 +309,8 @@
   (org-capture-templates
    `(("i" "inbox" entry (file+headline ,(concat org-directory "/inbox.org") "Tasks") "** TODO %?")))
   (org-log-done 'time)
-  :config
-  (setq org-ellipsis " ▾")
-  ;; Basically conseal in vim
-  (setq org-hide-emphasis-markers t))
+  (org-ellipsis " ▾")
+  (org-hide-emphasis-markers t))
 
 (use-package org-bullets
   :after org
@@ -337,6 +335,13 @@
 	(list #'org-roam-backlinks-section
 	      #'org-roam-reflinks-section
 	      ))
+  ;; display buffer
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
   ;; run sync at startup
   (org-roam-db-autosync-mode))
 
