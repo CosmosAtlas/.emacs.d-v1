@@ -372,6 +372,8 @@
   (interactive)
   (org-id-update-id-locations (org-roam--list-files org-roam-directory)))
 
+(use-package org-cliplink)
+
 ;; [fixme] mixed-pitch mode doesn't work perfectly. It uses :family
 ;; and ignores :fontset. Leading to some undesirable results : (
 ;; currently hacked by overloading default fontset
@@ -541,8 +543,8 @@
   (setq elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
 		   :api-url "http://admin@192.168.1.104:181"
 		   :password (shell-command-to-string "gopass -o freshrss"))
-		  ("fever+https://cosmos@cosmos547.com/miniflux/"
-		   :api-url "https://cosmos@cosmos547.com/miniflux/fever/"
+		  ("fever+http://cosmos@95.217.72.178:50180"
+		   :api-url "http://cosmos@95.217.72.178:50180/api/fever.php"
 		   :password (shell-command-to-string "gopass -o hyperion"))))
   (setq elfeed-protocol-enabled-protocols '(fever ttrss))
   (elfeed-protocol-enable))
@@ -692,6 +694,7 @@
   "oc" 'org-capture)
 
 (evil-define-key 'normal 'org-mode-map " ob" 'ivy-bibtex)
+(evil-define-key 'normal 'org-mode-map " opi" 'org-cliplink)
 (evil-define-key 'normal 'org-mode-map " zi" 'org-roam-node-insert)
 (evil-define-key 'normal 'org-mode-map " zb" 'org-roam-buffer-toggle)
 (evil-define-key 'normal 'org-mode-map " zt" 'org-roam-tag-add)
