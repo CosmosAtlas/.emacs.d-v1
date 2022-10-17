@@ -256,7 +256,8 @@
     (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0)
 
     ;; Set larger default font-size on MacOS
-    (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200)))
+    (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200))
+    (if (eq system-type 'gnu/linux) (set-face-attribute 'default nil :height 180)))
 
 ;;
 ;; Org Mode Configuration {{{
