@@ -222,42 +222,43 @@
 ;; Font settings generic
 ;;
 
+(defun cz/custom-fontset (font-family registry-name)
+  (create-fontset-from-fontset-spec
+   (font-xlfd-name
+    (if (member font-family (font-family-list))
+                (font-spec :family font-family
+                           :registry registry-name)
+                (font-spec :registry registry-name)))))
+
 ;; avoid problems with emacs running in terminal
 (when (display-graphic-p)
 
-    (set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
+  (set-face-attribute 'default nil :font "Sarasa Term SC" :height 130)
 
-    ;; [fixme] work around for mixed-pitch-mode
-    (dolist (charset '(kana han symbol cjk-misc bopomofo))
+  ;; [fixme] work around for mixed-pitch-mode
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font)
-			charset
-			(font-spec :family "Sarasa Term SC")))
+		      charset
+		      (font-spec :family "Sarasa Term SC")))
 
-    (create-fontset-from-fontset-spec
-    (font-xlfd-name
-     (font-spec :family "ETBembo"
-		:registry "fontset-myvariable")))
+  (cz/custom-fontset "ETBembo" "fontset-myvariable")
+  (cz/custom-fontset "Iosevka SS08" "fontset-mypitch")
 
-    (set-fontset-font
-    "fontset-myvariable"
-    'han (font-spec :family "FZPingXianYaSong-R-GBK"))
+  (set-fontset-font
+   "fontset-myvariable"
+   'han (font-spec :family "FZPingXianYaSong-R-GBK"))
 
-    (create-fontset-from-fontset-spec
-    (font-xlfd-name
-     (font-spec :family "Iosevka"
-		:registry "fontset-mypitch")))
+  (set-fontset-font
+   "fontset-mypitch"
+   'han (font-spec :family "Sarasa Term SC"))
 
-    (set-fontset-font
-    "fontset-mypitch"
-    'han (font-spec :family "Sarasa Term SC"))
+  (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 1.0)
 
-    (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 1.0)
+  (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0)
 
-    (set-face-attribute 'fixed-pitch nil :fontset "fontset-mypitch" :font "fontset-mypitch" :height 1.0)
-
-    ;; Set larger default font-size on MacOS
-    (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200))
-    (if (eq system-type 'gnu/linux) (set-face-attribute 'default nil :height 180)))
+  ;; Set larger default font-size on MacOS
+  (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200))
+  (if (eq system-type 'gnu/linux) (set-face-attribute 'default nil :height 180)))
 
 ;;
 ;; Org Mode Configuration {{{
