@@ -552,8 +552,8 @@
   (setq elfeed-protocol-log-trace t)
   (setq elfeed-log-level 'debug)
   (setq elfeed-protocol-fever-update-unread-only t)
-  (setq elfeed-feeds '(("ttrss+http://admin@192.168.1.104:181"
-		   :api-url "http://admin@192.168.1.104:181"
+  (setq elfeed-feeds '(("fever+http://cosmos@miniflux.pi.home"
+		   :api-url "http://cosmos@miniflux.pi.home/fever/"
 		   :password (shell-command-to-string "gopass -o freshrss"))
 		  ("fever+http://cosmos@95.217.72.178:50180"
 		   :api-url "http://cosmos@95.217.72.178:50180/api/fever.php"
