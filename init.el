@@ -235,6 +235,7 @@
 (defun cz/custom-fontset (font-family registry-name)
   (create-fontset-from-fontset-spec
    (font-xlfd-name
+    ;; only create a font-spec when the font is available, otherwise use default
     (if (member font-family (font-family-list))
                 (font-spec :family font-family
                            :registry registry-name)
@@ -268,7 +269,7 @@
 
   ;; Set larger default font-size on MacOS
   (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200))
-  (if (eq system-type 'gnu/linux) (set-face-attribute 'default nil :height 180)))
+  (if (string-equal (system-name) "cosmos-lab") (set-face-attribute 'default nil :height 150)))
 
 ;;
 ;; Org Mode Configuration {{{
