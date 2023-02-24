@@ -699,6 +699,7 @@
   ;; zettelkasten related
   "zf" 'org-roam-node-find
   "zc" 'org-roam-capture
+  "zd" 'org-roam-dailies-goto-today
   ;; toggles
   "t" '(:ignore t :which-key "toggles")
   "tt" '(counsel-load-theme :which-key "choose theme")
