@@ -707,6 +707,10 @@
   "oa" 'org-agenda
   "oc" 'org-capture)
 
+(evil-define-key 'insert 'org-mode-map (kbd "C-SPC b") 'ivy-bibtex)
+(evil-define-key 'insert 'org-mode-map (kbd "C-SPC opi") 'org-cliplink)
+(evil-define-key 'insert 'org-mode-map (kbd "C-SPC zi") 'org-roam-node-insert)
+
 (evil-define-key 'normal 'org-mode-map " ob" 'ivy-bibtex)
 (evil-define-key 'normal 'org-mode-map " opi" 'org-cliplink)
 (evil-define-key 'normal 'org-mode-map " zi" 'org-roam-node-insert)
