@@ -260,8 +260,16 @@
    'han (font-spec :family "FZPingXianYaSong-R-GBK"))
 
   (set-fontset-font
+   "fontset-myvariable"
+   'symbol (font-spec :family "Iosevka Nerd Font"))
+
+  (set-fontset-font
    "fontset-mypitch"
    'han (font-spec :family "Sarasa Term SC"))
+
+  (set-fontset-font
+   "fontset-mypitch"
+   'symbol (font-spec :family "Iosevka Nerd Font"))
 
   (set-face-attribute 'variable-pitch nil :fontset "fontset-myvariable" :font "fontset-myvariable" :height 1.0)
 
@@ -269,7 +277,7 @@
 
   ;; Set larger default font-size on MacOS
   (if (eq system-type 'darwin) (set-face-attribute 'default nil :height 200))
-  (if (string-equal (system-name) "cosmos-lab") (set-face-attribute 'default nil :height 150)))
+  (if (string-equal (system-name) "cosmos-lab") (set-face-attribute 'default nil :height 130)))
 
 ;;
 ;; Org Mode Configuration {{{
@@ -716,6 +724,7 @@
 (evil-define-key 'normal 'org-mode-map " zi" 'org-roam-node-insert)
 (evil-define-key 'normal 'org-mode-map " zb" 'org-roam-buffer-toggle)
 (evil-define-key 'normal 'org-mode-map " zt" 'org-roam-tag-add)
+
 
 ;; load from custom files
 (setq custom-file "~/.emacs.d/custom.el")
