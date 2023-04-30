@@ -105,8 +105,8 @@
 (straight-use-package 'use-package)
 
 (use-package straight
-  :custom
-  (straight-use-package-by-default t))
+  :config
+  (setq straight-use-package-by-default t))
 
 ;; End of package system setup }}}
 
@@ -123,7 +123,7 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
+  (setq evil-want-C-i-jump t)
   :config
   (evil-mode 1)
   (evil-set-undo-system 'undo-redo)
@@ -149,10 +149,9 @@
 
 ;; auto alignment
 (use-package evil-lion
-  :custom
-  (evil-lion-left-align-key (kbd "ga"))
-  (evil-lion-right-align-key (kbd "gA"))
   :config
+  (setq evil-lion-left-align-key (kbd "ga"))
+  (setq evil-lion-right-align-key (kbd "gA"))
   (evil-lion-mode))
 
 (use-package evil-org
@@ -181,14 +180,12 @@
 ;; End of evil
 
 (use-package highlight-indent-guides
-  :custom
-  (highlight-indent-guides-method 'column)
+  :config
+  (setq highlight-indent-guides-method 'column)
   :hook
   (prog-mode-hook . highlight-indent-guides-mode))
 
 (use-package command-log-mode)
-
-(use-package restart-emacs)
 
 (use-package git-gutter
   :init
@@ -567,15 +564,16 @@ Optional MODE specifies major mode used for display."
    (list (file-truename (concat org-directory "/zotero.bib")))))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  :init
+  (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 15))
 
 (use-package doom-themes
-  :custom
-  (doom-themes-enable-bold t)
-  (doom-themes-enable-italic t)
   :config
-  (load-theme 'doom-material-dark t)
+  (setq doom-themes-enable-bold t)
+  (setq doom-themes-enable-italic t)
+  (load-theme 'doom-ayu-dark t)
   (doom-themes-org-config))
 
 (use-package rainbow-delimiters
@@ -583,11 +581,11 @@ Optional MODE specifies major mode used for display."
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package which-key
-  :init
-  (which-key-mode)
+  :defer 0
   :diminish which-key-mode
-  :custom
-  (which-key-idle-delay 0.3))
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 0.3))
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
@@ -608,7 +606,6 @@ Optional MODE specifies major mode used for display."
   ([remap describe-key] . helpful-key))
 
 (use-package link-hint
-  :defer t
   :config
   (define-key evil-normal-state-map (kbd "SPC f") 'link-hint-open-link))
 
@@ -682,8 +679,8 @@ Optional MODE specifies major mode used for display."
 
 (use-package ebuku
   :after evil-collection org
-  :custom
-  (ebuku-database-path (file-truename (concat org-directory "/bookmarks.db"))))
+  :init
+  (setq ebuku-database-path (file-truename (concat org-directory "/bookmarks.db"))))
 
 (use-package fanyi)
 
