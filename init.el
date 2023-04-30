@@ -314,10 +314,105 @@
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
+
+;; Tag alignment for variable font
+;; src: https://emacs.stackexchange.com/a/75538/38015
+;; this could cause preformance issues, from the SO post,
+;; a few thousand line org file takes 2s to fully load
+
+(defcustom cz/org-tags-right nil
+  "When non-nil, align tags according to its value.
+Values are like for `org-tags-column', but counting from the
+windows right edge instead of from the left."
+  :type 'integer)
+
+(defun cz/org-align-tags (limit &optional force)
+  "Align all the tags in Org buffer up to position LIMIT.
+How tags are aligned is determined by `org-tags-column' unless
+`cz/org-tags-right' is non-nil, in which case it controls alignment."
+  (save-match-data
+    (when (eq major-mode 'org-mode)
+      (let* ((col org-tags-column)
+             (rcol cz/org-tags-right)
+             (charw (frame-char-width))
+             (ellipsis-px (cz/string-display-pixel-width org-ellipsis))
+             (regx "^\\*+ \\(.+?\\)\\([ \t]+\\)\\(:\\(?:[^ \n]+:\\)+\\)$"))
+    (while (re-search-forward regx limit t)
+          (let* ((blanks (match-string 2))
+                 (bstart (match-beginning 2))
+                 (bend (match-end 2)))
+        (when (and blanks
+               (or force
+               (not (get-text-property bstart
+                                                   'org-tag-aligned))))
+          (with-silent-modifications
+                (put-text-property
+                 bstart bend
+                 'org-tag-aligned t)
+            (put-text-property
+             bstart bend
+             'display
+                 (cz/org-align-tags--display col rcol charw
+                                             ellipsis-px))))))))))
+
+(defun cz/org-align-tags--display (col rcol charw ellipsis-px)
+  "Constructs the display property for `cz/org-align-tags'."
+  (cons 'space
+        (cond
+         (rcol
+          (list :align-to
+                (list '- 'right
+                      (list
+                       (+ (* (1+ (abs rcol)) charw)
+                          (if (> rcol 0) 0
+                            (+ (cz/org-align-tags--tags-px)
+                               ellipsis-px)))))))
+         ((and col (not (equal col 0)))
+          (list :align-to
+                (list '+ 'left
+                      (list
+                       (- (* (abs col) charw)
+                          (if (> col 0) 0
+                            (cz/org-align-tags--tags-px)))))))
+         (t
+          (list :width 1)))))
+
+(defun cz/org-align-tags--tags-px ()
+  "Calculate pixel width of the regex part matching tags.
+Uses match data from `cz/org-align-tags'."
+  (car (window-text-pixel-size
+        (selected-window)
+        (match-beginning 3)
+        (match-end 3))))
+
+(defun cz/string-display-pixel-width (string &optional mode)
+  "Calculate pixel width of STRING.
+Optional MODE specifies major mode used for display."
+  (with-temp-buffer
+    (with-silent-modifications
+      ;; (setf (buffer-string) string)
+      (insert string))
+    (when (fboundp mode)
+      (funcall mode)
+      (font-lock-fontify-buffer))
+    (if (get-buffer-window (current-buffer))
+    (car (window-text-pixel-size nil (line-beginning-position) (point)))
+      (set-window-buffer nil (current-buffer))
+      (car (window-text-pixel-size nil (line-beginning-position) (point))))))
+
+(defun cz/org-fix-tag-alignment ()
+  (setq org-tags-column -77) ;; adjust this
+  (setq cz/org-tags-right 0) ;; or this
+  (font-lock-add-keywords 'org-mode '(cz/org-align-tags) t)
+  (add-to-list 'font-lock-extra-managed-props 'org-tag-aligned))
+
+
 (use-package org
   :hook
   (org-mode . cz/org-mode-setup)
   (org-mode . cz/org-font-setup)
+  :init
+  (add-hook 'org-mode-hook  #'cz/org-fix-tag-alignment 91)
   :custom
   (org-default-notes-file (concat org-directory "/notes.org"))
   (org-agenda-files (list (concat org-directory "/gtd.org")
@@ -342,6 +437,21 @@
 (use-package org-autolist
   :after org
   :hook (org-mode . org-autolist-mode))
+
+(use-package org-appear
+  :straight (org-appear :type git
+                        :host github
+                        :repo "awth13/org-appear")
+  :after org
+  :config
+  (setq org-link-descriptive t)
+  (setq org-appear-autolinks t)
+  :hook (org-mode . org-appear-mode))
+
+(use-package emacsql
+  :straight (emacsql :type git
+                     :host github
+                     :repo "magit/emacsql"))
 
 ;; [fixme] explore org-roam-ui
 (use-package org-roam
