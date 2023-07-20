@@ -458,11 +458,24 @@ Optional MODE specifies major mode used for display."
   (setq org-roam-directory
 	(file-truename (concat org-directory "/org-roam-test")))
   (setq org-roam-completion-everywhere t)
-  (setq org-roam-node-display-template "${title} [${tags}]")
-  (setq org-roam-mode-sections
+  (setq org-roam-node-display-template "${title:*} [${tags:10}]") (setq org-roam-mode-sections
 	(list #'org-roam-backlinks-section
 	      #'org-roam-reflinks-section
 	      ))
+  (setq org-roam-dailies-directory "weekly/")
+  (setq org-roam-dailies-capture-templates
+      '(("d" "default" entry "** %?" :if-new
+        (file+head+olp "%<%G-W%V>.org" "#+title: %<%G-W%V>\n"
+                       ("%<%A %Y-%m-%d>")))))
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n")
+           :unnarrowed t)
+          ("r" "bibliography reference" plain "%?"
+           :target
+           (file+head "references/${citekey}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
   ;; display buffer
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\*"
@@ -486,15 +499,6 @@ Optional MODE specifies major mode used for display."
   (orb-insert-interface 'ivy-bibtex))
 
 (setq orb-preformat-keywords '("citekey" "author" "date"))
-(setq org-roam-capture-templates
-      '(("d" "default" plain "%?"
-	 :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-			    "#+title: ${title}\n")
-	 :unnarrowed t)
-	("r" "bibliography reference" plain "%?"
-         :target
-         (file+head "references/${citekey}.org" "#+title: ${title}\n")
-         :unnarrowed t)))
 
 (defun cz/org-id-update-roam-locations ()
   (interactive)
