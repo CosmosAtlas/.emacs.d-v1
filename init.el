@@ -177,6 +177,14 @@
   :config
   (global-evil-surround-mode 1))
 
+(use-package sis
+  :config
+  (if (eq system-type 'windows-nt)
+      (sis-ism-lazyman-config "1033" "2052" 'im-select))
+  (sis-global-respect-mode t)
+  (sis-global-context-mode t)
+  (sis-global-inline-mode t))
+
 ;; End of evil
 
 (use-package highlight-indent-guides
